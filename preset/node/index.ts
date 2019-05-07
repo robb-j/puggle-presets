@@ -59,7 +59,7 @@ const readme = (name: string) => trimInlineTemplate`
   > This project was set up by [puggle](https://npm.im/puggle)
 `
 
-export class RobbJNodePreset implements Preset {
+module.exports = class RobbJNodePreset implements Preset {
   title = 'robb-j:node'
   version = '0.0.0'
 
