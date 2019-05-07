@@ -1,0 +1,48 @@
+{
+  "name": "@robb_j/puggle-presets",
+  "description": "A monorepo of puggle presets",
+  "private": true,
+  "repository": "robb-j/puggle-presets",
+  "author": "Rob Anderson (https://r0b.io)",
+  "license": "MIT",
+  "scripts": {
+    "publish": "",
+    "build": "lerna run build"
+  },
+  "engines": {
+    "node": ">=8"
+  },
+  "devDependencies": {
+    "@types/node": "^10.14.6",
+    "husky": "^2.2.0",
+    "jest": "^24.8.0",
+    "lerna": "^3.13.4",
+    "lint-staged": "^8.1.6",
+    "prettier": "^1.17.0",
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.4.5"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx,json,css,md}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/dist/"
+    ]
+  }
+}

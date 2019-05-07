@@ -1,0 +1,27 @@
+{
+  "name": "@robb_j/puggle-preset-node",
+  "version": "0.0.0",
+  "description": "A puggle preset for a simple node.js project",
+  "main": "index.js",
+  "files": [
+    "index.js"
+  ],
+  "repository": "robb-j/puggle-presets",
+  "homepage": "https://github.com/robb-j/puggle-presets/blob/master/preset/node/README.d",
+  "author": "Rob Anderson <rob@andrsn.uk>",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc index.ts"
+  },
+  "keywords": [
+    "puggle",
+    "puggle-preset"
+  ],
+  "engines": {
+    "node": ">=8"
+  },
+  "dependencies": {
+    "puggle": "^0.2.0-beta.3"
+  },
+  "devDependencies": {}
+}
