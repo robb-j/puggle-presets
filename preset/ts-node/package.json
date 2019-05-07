@@ -1,6 +1,6 @@
 {
   "name": "@robb_j/puggle-preset-ts-node",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A puggle preset for a TypeScript node.js project",
   "main": "index.js",
   "files": [
