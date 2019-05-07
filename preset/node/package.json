@@ -21,6 +21,6 @@
     "node": ">=8"
   },
   "dependencies": {
-    "puggle": "^0.2.0-beta.3"
+    "puggle": "^0.2.0-beta.4"
   }
 }
