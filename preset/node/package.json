@@ -11,6 +11,7 @@
   "author": "Rob Anderson <rob@andrsn.uk>",
   "license": "MIT",
   "scripts": {
+    "preversion": "npm run build",
     "build": "tsc index.ts"
   },
   "keywords": [
