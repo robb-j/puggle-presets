@@ -1,6 +1,6 @@
 {
   "name": "@robb_j/puggle-preset-node",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A puggle preset for a simple node.js project",
   "main": "index.js",
   "files": [
