@@ -7,7 +7,7 @@
     "index.js"
   ],
   "repository": "robb-j/puggle-presets",
-  "homepage": "https://github.com/robb-j/puggle-presets/blob/master/preset/node/README.d",
+  "homepage": "https://github.com/robb-j/puggle-presets/blob/master/preset/node/README.md",
   "author": "Rob Anderson <rob@andrsn.uk>",
   "license": "MIT",
   "scripts": {
