@@ -12,6 +12,8 @@ import {
   TypeScriptPlugin
 } from 'puggle'
 
+const pluginPackage = require('./package.json')
+
 const indexTs = (name: string) => trimInlineTemplate`
   // 
   // The app entrypoint
@@ -61,7 +63,7 @@ const readme = (name: string) => trimInlineTemplate`
 
 module.exports = class RobbJTsNodePreset implements Preset {
   title = 'robb-j:ts-node'
-  version = '0.0.0'
+  version = pluginPackage.version
 
   plugins = [
     new NpmPlugin(),

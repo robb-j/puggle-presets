@@ -12,6 +12,8 @@ import {
   VPackageJson
 } from 'puggle'
 
+const pluginPackage = require('./package.json')
+
 const indexJs = (name: string) => trimInlineTemplate`
   //
   // The app entrypoint
@@ -61,7 +63,7 @@ const readme = (name: string) => trimInlineTemplate`
 
 module.exports = class RobbJNodePreset implements Preset {
   title = 'robb-j:node'
-  version = '0.0.0'
+  version = pluginPackage.version
 
   plugins = [
     new NpmPlugin(),
