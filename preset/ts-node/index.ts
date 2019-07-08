@@ -78,8 +78,7 @@ module.exports = class RobbJTsNodePreset implements Preset {
     //
     // Tweak the package.json
     //
-    npmPackage.dependencies['dotenv'] = '^7.0.0'
-    npmPackage.devDependencies['nodemon'] = '^1.18.10'
+    npmPackage.dependencies['dotenv'] = '^8.0.0'
 
     npmPackage.values['main'] = 'dist/index.js'
     npmPackage.values['types'] = 'dist/index.d.js'
