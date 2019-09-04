@@ -12,6 +12,8 @@ import {
   VPackageJson
 } from 'puggle'
 
+import { findLatestVersion as pkg } from '@robb_j/puggle-util-npm'
+
 const pluginPackage = require('./package.json')
 
 const indexJs = (name: string) => trimInlineTemplate`
@@ -78,7 +80,9 @@ module.exports = class RobbJNodePreset implements Preset {
     //
     // Tweak the package.json
     //
-    npmPackage.dependencies['dotenv'] = '^8.0.0'
+    npmPackage.dependencies['dotenv'] = await pkg('dotenv', '8.x.x')
+    // npmPackage.dependencies['dotenv'] = '^8.0.0'
+    npmPackage.devDependencies['nodemon'] = await pkg('nodemon', '1.x.x')
     npmPackage.devDependencies['nodemon'] = '^1.19.1'
 
     npmPackage.values['main'] = 'src/index.js'

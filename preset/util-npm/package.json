@@ -1,0 +1,35 @@
+{
+  "name": "@robb_j/puggle-util-npm",
+  "version": "0.1.6",
+  "description": "A puggle utility for npm",
+  "main": "index.js",
+  "files": [
+    "index.js"
+  ],
+  "repository": "robb-j/puggle-util-npm",
+  "homepage": "https://github.com/robb-j/puggle-util-npm/blob/master/preset/node/README.md",
+  "author": "Rob Anderson <rob@andrsn.uk>",
+  "license": "MIT",
+  "scripts": {
+    "test": "node -r ts-node/register test.ts",
+    "preversion": "npm run build",
+    "build": "tsc"
+  },
+  "keywords": [
+    "puggle"
+  ],
+  "engines": {
+    "node": ">=8"
+  },
+  "dependencies": {
+    "got": "^9.6.0",
+    "semver": "^6.3.0"
+  },
+  "devDependencies": {
+    "@types/cli-table": "^0.3.0",
+    "@types/got": "^9.6.7",
+    "@types/semver": "^6.0.1",
+    "cli-table": "^0.3.1",
+    "ts-node": "^8.3.0"
+  }
+}
