@@ -1,15 +1,18 @@
 import {
   Preset,
-  PluginArgs,
   VDir,
   VFile,
   VIgnoreFile,
-  trimInlineTemplate,
-  JestPlugin,
-  NpmPlugin,
-  PrettierPlugin,
   VPackageJson,
-  TypeScriptPlugin
+  trimInlineTemplate,
+  jestPlugin,
+  npmPlugin,
+  prettierPlugin,
+  eslintPlugin,
+  dockerPlugin,
+  gitPlugin,
+  typescriptPlugin,
+  PatchStrategy
 } from 'puggle'
 
 const pluginPackage = require('./package.json')
@@ -61,42 +64,43 @@ const readme = (name: string) => trimInlineTemplate`
   > This project was set up by [puggle](https://npm.im/puggle)
 `
 
-module.exports = class RobbJTsNodePreset implements Preset {
-  title = 'robb-j:ts-node'
-  version = pluginPackage.version
+module.exports = {
+  name: 'robb-j:ts-node',
+  version: pluginPackage.version,
 
-  plugins = [
-    new NpmPlugin(),
-    new TypeScriptPlugin(),
-    new JestPlugin(),
-    new PrettierPlugin()
-  ]
+  plugins: [
+    gitPlugin,
+    npmPlugin,
+    dockerPlugin,
+    jestPlugin,
+    prettierPlugin,
+    typescriptPlugin
+  ],
 
-  async extendVirtualFileSystem(root: VDir, { projectName }: PluginArgs) {
-    let npmPackage = VPackageJson.getPackageOrFail(root)
+  async apply(root, { targetName }) {
+    let npmPackage = VPackageJson.getOrFail(root)
 
-    //
-    // Tweak the package.json
-    //
-    npmPackage.dependencies['dotenv'] = '^8.0.0'
-    npmPackage.devDependencies['nodemon'] = '^1.19.1'
+    npmPackage.addLatestDependencies({
+      dotenv: '^8.0.0'
+    })
+    npmPackage.addLatestDevDependencies({
+      nodemon: '^1.19.1'
+    })
 
-    npmPackage.values['main'] = 'dist/index.js'
-    npmPackage.values['types'] = 'dist/index.d.js'
+    npmPackage.addPatch('main', PatchStrategy.placeholder, 'dist/index.js')
+    npmPackage.addPatch('types', PatchStrategy.placeholder, 'dist/index.d.js')
 
-    npmPackage.scripts['preversion'] = 'npm run test -s && npm run build'
-    npmPackage.scripts['start'] = 'node -r dotenv/config dist/index.js'
-    npmPackage.scripts[
-      'dev'
-    ] = `NODE_ENV=development nodemon -w src -e ts -x 'npx ts-node -r dotenv/config' src/index.ts`
+    npmPackage.addPatch('scripts', PatchStrategy.placeholder, {
+      preversion: 'npm run test -s && npm run build',
+      start: 'node -r dotenv/config dist/index.js',
+      dev:
+        "NODE_ENV=development nodemon -w src -e ts -x 'npx ts-node -r dotenv/config' src/index.ts"
+    })
 
-    //
-    // Add extra files
-    //
     root.addChild(
-      new VFile('README.md', readme(projectName)),
+      new VFile('README.md', readme(targetName)),
       new VDir('src', [
-        new VFile('index.ts', indexTs(projectName)),
+        new VFile('index.ts', indexTs(targetName)),
         new VDir('__test__', [new VFile('index.spec.ts', indexSpecTs())])
       ]),
       new VFile('.editorconfig', editorconfig()),
@@ -109,4 +113,4 @@ module.exports = class RobbJTsNodePreset implements Preset {
       ])
     )
   }
-}
+} as Preset
