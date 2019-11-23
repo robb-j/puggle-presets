@@ -8,7 +8,8 @@ import {
   PatchStrategy,
   VIgnoreFile,
   VConfigFile,
-  VConfigType
+  VConfigType,
+  presetify
 } from 'puggle'
 
 const indexJs = (name: string) => trimInlineTemplate`
@@ -83,7 +84,7 @@ const eslintConf = {
   extends: ['standard', 'prettier', 'prettier/standard']
 }
 
-module.exports = {
+module.exports = presetify({
   name: 'robb-j:node',
   version: require('./package.json').version,
 
@@ -92,33 +93,56 @@ module.exports = {
   async apply(root, { targetName }) {
     let npm = VPackageJson.getOrFail(root)
 
-    await npm.addLatestDependencies({
-      dotenv: '^8.0.0'
-    })
-
+    //
+    // Setup testing
+    //
     await npm.addLatestDevDependencies({
-      eslint: '^6.2.1',
-      'eslint-config-prettier': '^6.1.0',
-      'eslint-config-standard': '^14.0.0',
-      'eslint-plugin-import': '^2.18.2',
-      'eslint-plugin-node': '^9.1.0',
-      'eslint-plugin-promise': '^4.2.1',
-      'eslint-plugin-standard': '^4.0.1',
-      jest: '^24.9.0',
-      'lint-staged': '^9.2.3',
-      prettier: '^1.18.2',
-      yorkie: '^2.0.0'
+      jest: '^24.x'
     })
 
     npm.addPatch('scripts', PatchStrategy.placeholder, {
-      coverage: 'jest --coverage',
-      lint: 'eslint src',
-      postversion: 'node tools/buildAndPush.js',
-      prettier: "prettier --write '**/*.{js,json,css,md}'",
-      start: 'node -r dotenv/config src/index.js',
       test: 'jest',
-      dev:
-        "NODE_ENV=development nodemon -x 'node -r dotenv/config' --watch src src/index.js"
+      coverage: 'jest --coverage'
+    })
+
+    //
+    // Setup eslint
+    //
+    await npm.addLatestDevDependencies({
+      eslint: '^6.x',
+      'eslint-config-prettier': '^6.x',
+      'eslint-config-standard': '^14.x',
+      'eslint-plugin-import': '^2.x',
+      'eslint-plugin-node': '^10.x',
+      'eslint-plugin-promise': '^4.x',
+      'eslint-plugin-standard': '^4.x'
+    })
+
+    npm.addPatch('scripts', PatchStrategy.placeholder, {
+      lint: 'eslint src'
+    })
+
+    root.addChild(
+      new VConfigFile('.eslintrc.yml', VConfigType.yaml, eslintConf, {
+        comment: 'Configuration for eslint ~ https://eslint.org/',
+        strategy: PatchStrategy.persist
+      })
+    )
+
+    //
+    // Setup prettier
+    //
+    const matcher = '*.{js,json,css,md}'
+
+    await npm.addLatestDevDependencies({
+      prettier: '^1.x',
+      yorkie: '^2.x',
+      'lint-staged': '^9.x'
+    })
+
+    npm.addPatch('prettier', PatchStrategy.persist, {
+      semi: false,
+      singleQuote: true
     })
 
     npm.addPatch('gitHooks', PatchStrategy.persist, {
@@ -126,61 +150,84 @@ module.exports = {
     })
 
     npm.addPatch('lint-staged', PatchStrategy.persist, {
-      '*.{js,json,css,less,md}': ['prettier --write', 'git add'],
+      [matcher]: ['prettier --write', 'git add'],
       '*.{js}': ['eslint', 'git add']
     })
 
-    npm.addPatch('main', PatchStrategy.placeholder, 'src/index.js')
+    npm.addPatch('scripts', PatchStrategy.placeholder, {
+      prettier: `prettier --write '**/${matcher}'`
+    })
+
+    root.addChild(
+      new VIgnoreFile(
+        '.prettierignore',
+        'Files for prettier to ignore',
+        ['node_modules', 'coverage'],
+        PatchStrategy.persist
+      )
+    )
 
     //
-    // Add docker files
+    // Setup docker
     //
     root.addChild(
       new VFile('Dockerfile', dockerfile(), PatchStrategy.placeholder),
       new VIgnoreFile(
         '.dockerignore',
         'Files to ignore from the docker daemon',
-        ['.git', 'node_modules', 'coverage', '.DS_Store', '*.env']
+        ['.git', 'node_modules', 'coverage', '.DS_Store', '*.env'],
+        PatchStrategy.persist
       )
     )
 
     //
-    // Add eslint config
+    // Setup git
     //
     root.addChild(
-      new VConfigFile('.eslintrc.yml', VConfigType.yaml, eslintConf, {
-        comment: 'Configuration for eslint ~ https://eslint.org/'
-      })
-    )
-
-    //
-    // Add gitignore
-    //
-    root.addChild(
-      new VIgnoreFile('.gitignore', 'Files to ignore from git', [
-        '*.env',
-        'node_modules',
-        '.DS_Store',
-        'coverage'
-      ])
+      new VIgnoreFile(
+        '.gitignore',
+        'Files to ignore from git',
+        ['*.env', 'node_modules', '.DS_Store', 'coverage'],
+        PatchStrategy.persist
+      )
     )
 
     //
     // Add editorconfig
     //
-    root.addChild(new VFile('.editorconfig', editorconfig()))
+    root.addChild(
+      new VFile('.editorconfig', editorconfig(), PatchStrategy.persist)
+    )
+
+    //
+    // Setup template
+    //
+    await npm.addLatestDependencies({
+      dotenv: '^8.x'
+    })
+
+    await npm.addLatestDevDependencies({
+      nodemon: '^1.x'
+    })
+
+    npm.addPatch('scripts', PatchStrategy.placeholder, {
+      preversion: 'npm run test -s',
+      start: 'node -r dotenv/config src/index.js',
+      dev: "nodemon -x 'npm start' --watch src src/index.js"
+    })
+
+    npm.addPatch('main', PatchStrategy.placeholder, 'src/index.js')
 
     //
     // Add placeholder files
     //
     root.addChild(
-      new VFile('README.md', readme(targetName), PatchStrategy.placeholder),
+      new VFile('README.md', readme(targetName)),
+      new VFile('.env', 'NODE_ENV=development'),
       new VDir('src', [
-        new VDir('__tests__', [
-          new VFile('index.spec.js', indexSpecJs(), PatchStrategy.placeholder)
-        ]),
-        new VFile('index.js', indexJs(targetName), PatchStrategy.placeholder)
+        new VDir('__tests__', [new VFile('index.spec.js', indexSpecJs())]),
+        new VFile('index.js', indexJs(targetName))
       ])
     )
   }
-} as Preset
+})
