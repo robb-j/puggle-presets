@@ -11,8 +11,7 @@ import {
   VConfigType,
   presetify
 } from 'puggle'
-
-const pluginPackage = require('./package.json')
+import { addPrettier } from './utils/prettier'
 
 const indexTs = (name: string) => trimInlineTemplate`
   // 
@@ -109,9 +108,9 @@ const tsconfig = () => ({
   exclude: ['node_modules']
 })
 
-module.exports = presetify({
+export default presetify({
   name: 'robb-j:ts-node',
-  version: pluginPackage.version,
+  version: '0.2.1',
 
   plugins: [npmPlugin],
 
@@ -161,39 +160,7 @@ module.exports = presetify({
     //
     //  Setup prettier
     //
-    const matcher = '*.{js,json,css,md,ts,tsx}'
-
-    await npm.addLatestDevDependencies({
-      prettier: '^1.x',
-      yorkie: '^2.x',
-      'lint-staged': '^9.x'
-    })
-
-    npm.addPatch('prettier', PatchStrategy.persist, {
-      semi: false,
-      singleQuote: true
-    })
-
-    npm.addPatch('gitHooks', PatchStrategy.persist, {
-      'pre-commit': 'lint-staged'
-    })
-
-    npm.addPatch('lint-staged', PatchStrategy.persist, {
-      [matcher]: ['prettier --write', 'git add']
-    })
-
-    npm.addPatch('scripts', PatchStrategy.placeholder, {
-      prettier: `prettier --write '**/${matcher}'`
-    })
-
-    root.addChild(
-      new VIgnoreFile(
-        '.prettierignore',
-        'Files for prettier to ignore',
-        ['coverage', 'node_modules', 'dist'],
-        PatchStrategy.persist
-      )
-    )
+    await addPrettier(root, npm, 'js,json,css,md,ts,tsx')
 
     //
     // Setup docker
