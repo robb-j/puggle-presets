@@ -12,6 +12,7 @@ import {
   presetify
 } from 'puggle'
 import { addPrettier } from './utils/prettier'
+import { addEslint } from './utils/eslint'
 
 const indexJs = (name: string) => trimInlineTemplate`
   //
@@ -72,19 +73,6 @@ const dockerfile = () => trimInlineTemplate`
   CMD [ "npm", "start", "-s" ]
 `
 
-const eslintConf = {
-  root: true,
-  parserOptions: {
-    sourceType: 'module',
-    ecmaVersion: 2018
-  },
-  env: {
-    node: true,
-    jest: true
-  },
-  extends: ['standard', 'prettier', 'prettier/standard']
-}
-
 export default presetify({
   name: 'robb-j:node',
   version: '0.2.1',
@@ -109,26 +97,7 @@ export default presetify({
     //
     // Setup eslint
     //
-    await npm.addLatestDevDependencies({
-      eslint: '^6.x',
-      'eslint-config-prettier': '^6.x',
-      'eslint-config-standard': '^14.x',
-      'eslint-plugin-import': '^2.x',
-      'eslint-plugin-node': '^10.x',
-      'eslint-plugin-promise': '^4.x',
-      'eslint-plugin-standard': '^4.x'
-    })
-
-    npm.addPatch('scripts', PatchStrategy.placeholder, {
-      lint: 'eslint src'
-    })
-
-    root.addChild(
-      new VConfigFile('.eslintrc.yml', VConfigType.yaml, eslintConf, {
-        comment: 'Configuration for eslint ~ https://eslint.org/',
-        strategy: PatchStrategy.persist
-      })
-    )
+    addEslint(root, npm)
 
     //
     // Setup prettier
