@@ -51,7 +51,7 @@ const toIgnore = ['*.env', '.DS_Store', 'node_modules', 'coverage', 'dist']
 
 export default presetify({
   name: 'robb-j:ts-node',
-  version: '0.2.1',
+  version: '0.2.2',
 
   plugins: [npmPlugin],
 

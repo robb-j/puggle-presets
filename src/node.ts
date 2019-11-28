@@ -61,7 +61,7 @@ const eslintConf = {
 
 export default presetify({
   name: 'robb-j:node',
-  version: '0.2.1',
+  version: '0.2.2',
 
   plugins: [npmPlugin],
 
