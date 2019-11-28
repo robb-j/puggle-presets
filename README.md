@@ -9,14 +9,18 @@ of [puggle](https://www.npmjs.com/package/puggle) presets
 
 - [robb-j:node](/preset/node)
 - [robb-j:ts-node](/preset/ts-node)
+- [robb-j:chowchow](/preset/chowchow)
 
-## Lerna commands
+## Future explorations
 
-```bash
-# Sort out dependencies
-npx lerna bootstrap
+- Move back to plugins but in this repo?
+- jsx-based syntax for VFile & VDir structures
 
-# Publish any changes since the last publish, checking each sub-package
-npx lerna publish
-
+```ts
+root.addChild(
+  <VFile name="README.md" contents={targetName} />,
+  <VDir name="src">
+    <VFile name=".env" contents="NODE_ENV=development" />
+  </VDir>
+)
 ```

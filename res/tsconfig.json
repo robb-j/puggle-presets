@@ -4,8 +4,8 @@
     "target": "es2018",
     "module": "commonjs",
     "moduleResolution": "node",
-    "sourceMap": false,
-    "declaration": false,
+    "sourceMap": true,
+    "declaration": true,
     "pretty": true,
     "newLine": "lf",
     "stripInternal": true,
@@ -19,5 +19,5 @@
     "skipLibCheck": true
   },
   "include": ["src"],
-  "exclude": ["node_modules", "res"]
+  "exclude": ["node_modules"]
 }

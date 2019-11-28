@@ -1,5 +1,4 @@
 import {
-  Preset,
   VDir,
   VFile,
   VPackageJson,
@@ -12,6 +11,8 @@ import {
   presetify
 } from 'puggle'
 import { addPrettier } from './utils/prettier'
+import { addJest } from './utils/jest'
+import { readResource } from './utils/vfile'
 
 const indexJs = (name: string) => trimInlineTemplate`
   //
@@ -35,21 +36,6 @@ const indexSpecJs = () => trimInlineTemplate`
   })
 `
 
-const editorconfig = () => trimInlineTemplate`
-  #
-  # Editor config, for sharing IDE preferences (https://editorconfig.org)
-  #
-
-  root = true
-
-  [*]
-  charset = utf-8
-  indent_style = space
-  indent_size = 2
-  end_of_line = lf
-  insert_final_newline = true
-`
-
 const readme = (name: string) => trimInlineTemplate`
   # ${name}
 
@@ -58,18 +44,6 @@ const readme = (name: string) => trimInlineTemplate`
   ---
 
   > This project was set up by [puggle](https://npm.im/puggle)
-`
-
-const dockerfile = () => trimInlineTemplate`
-  # Use a node alpine image install packages and run the start script
-  FROM node:12-alpine
-  WORKDIR /app
-  EXPOSE 3000
-  ENV NODE_ENV production
-  COPY ["package*.json", "/app/"]
-  RUN npm ci &> /dev/null
-  COPY ["src", "/app/src"]
-  CMD [ "npm", "start", "-s" ]
 `
 
 const eslintConf = {
@@ -97,14 +71,7 @@ export default presetify({
     //
     // Setup testing
     //
-    await npm.addLatestDevDependencies({
-      jest: '^24.x'
-    })
-
-    npm.addPatch('scripts', PatchStrategy.placeholder, {
-      test: 'jest',
-      coverage: 'jest --coverage'
-    })
+    await addJest(root, npm)
 
     //
     // Setup eslint
@@ -139,7 +106,11 @@ export default presetify({
     // Setup docker
     //
     root.addChild(
-      new VFile('Dockerfile', dockerfile(), PatchStrategy.placeholder),
+      new VFile(
+        'Dockerfile',
+        await readResource('docker/js.Dockerfile'),
+        PatchStrategy.placeholder
+      ),
       new VIgnoreFile(
         '.dockerignore',
         'Files to ignore from the docker daemon',
@@ -164,7 +135,11 @@ export default presetify({
     // Add editorconfig
     //
     root.addChild(
-      new VFile('.editorconfig', editorconfig(), PatchStrategy.persist)
+      new VFile(
+        '.editorconfig',
+        await readResource('.editorconfig'),
+        PatchStrategy.persist
+      )
     )
 
     //

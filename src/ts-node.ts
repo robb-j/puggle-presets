@@ -7,11 +7,13 @@ import {
   trimInlineTemplate,
   npmPlugin,
   PatchStrategy,
-  VConfigFile,
-  VConfigType,
   presetify
 } from 'puggle'
+
 import { addPrettier } from './utils/prettier'
+import { addTypescript } from './utils/typescript'
+import { readVFile, readResource } from './utils/vfile'
+import { addJestWithTypescript } from './utils/jest'
 
 const indexTs = (name: string) => trimInlineTemplate`
   // 
@@ -35,21 +37,6 @@ const indexSpecTs = () => trimInlineTemplate`
   })
 `
 
-const editorconfig = () => trimInlineTemplate`
-  #
-  # Editor config, for sharing IDE preferences (https://editorconfig.org)
-  #
-  
-  root = true
-
-  [*]
-  charset = utf-8
-  indent_style = space
-  indent_size = 2
-  end_of_line = lf
-  insert_final_newline = true
-`
-
 const readme = (name: string) => trimInlineTemplate`
   # ${name}
   
@@ -60,53 +47,7 @@ const readme = (name: string) => trimInlineTemplate`
   > This project was set up by [puggle](https://npm.im/puggle)
 `
 
-const dockerfile = () => trimInlineTemplate`
-  # [0] A common base for both stages
-  FROM node:12-alpine as base
-  WORKDIR /app
-  COPY ["package*.json", "tsconfig.json", "/app/"]
-
-  # [1] A builder to install modules and run a build
-  FROM base as builder
-  ENV NODE_ENV development
-  RUN npm ci &> /dev/null
-  COPY src /app/src
-  RUN npm run build -s &> /dev/null
-
-  # [2] From the base again, install production deps and copy compilled code
-  FROM base as dist
-  ENV NODE_ENV production
-  RUN npm ci &> /dev/null
-  COPY --from=builder /app/dist /app/dist
-  EXPOSE 3000
-  CMD [ "npm", "start", "-s" ]
-`
-
-const tsconfig = () => ({
-  compilerOptions: {
-    outDir: 'dist',
-    target: 'es2018',
-    module: 'commonjs',
-    moduleResolution: 'node',
-    esModuleInterop: true,
-    allowSyntheticDefaultImports: true,
-    sourceMap: true,
-    declaration: true,
-    pretty: true,
-    newLine: 'lf',
-    stripInternal: true,
-    strict: true,
-    noImplicitReturns: true,
-    noUnusedLocals: false,
-    noUnusedParameters: false,
-    noFallthroughCasesInSwitch: true,
-    noEmitOnError: true,
-    forceConsistentCasingInFileNames: true,
-    skipLibCheck: true
-  },
-  include: ['src'],
-  exclude: ['node_modules']
-})
+const toIgnore = ['*.env', '.DS_Store', 'node_modules', 'coverage', 'dist']
 
 export default presetify({
   name: 'robb-j:ts-node',
@@ -120,42 +61,12 @@ export default presetify({
     //
     // Setup testing
     //
-    await npm.addLatestDevDependencies({
-      jest: '^24.x',
-      'ts-jest': '^24.x',
-      '@types/jest': '^24.x'
-    })
-
-    npm.addPatch('jest', PatchStrategy.persist, {
-      preset: 'ts-jest',
-      testEnvironment: 'node',
-      testPathIgnorePatterns: ['/node_modules/', '/dist/']
-    })
-
-    npm.addPatch('scripts', PatchStrategy.placeholder, {
-      test: 'jest',
-      coverage: 'jest --coverage'
-    })
+    await addJestWithTypescript(root, npm)
 
     //
     // Setup typescript
     //
-    await npm.addLatestDevDependencies({
-      typescript: '^3.x',
-      'ts-node': '^8.x',
-      '@types/node': '^11.x'
-    })
-
-    root.addChild(
-      new VConfigFile('tsconfig.json', VConfigType.json, tsconfig(), {
-        strategy: PatchStrategy.persist
-      })
-    )
-
-    npm.addPatch('scripts', PatchStrategy.placeholder, {
-      build: 'tsc',
-      lint: 'tsc --noEmit'
-    })
+    await addTypescript(root, npm)
 
     //
     //  Setup prettier
@@ -166,11 +77,11 @@ export default presetify({
     // Setup docker
     //
     root.addChild(
-      new VFile('Dockerfile', dockerfile(), PatchStrategy.placeholder),
+      await readVFile('Dockerfile', 'docker/ts.Dockerfile'),
       new VIgnoreFile(
         '.dockerignore',
         'Files to ignore from the docker daemon',
-        ['*.env', '.DS_Store', 'node_modules', 'coverage', 'dist'],
+        toIgnore,
         PatchStrategy.persist
       )
     )
@@ -182,7 +93,7 @@ export default presetify({
       new VIgnoreFile(
         '.gitignore',
         'Files to ignore from git source control',
-        ['*.env', '.DS_Store', 'node_modules', 'coverage', 'dist'],
+        toIgnore,
         PatchStrategy.persist
       )
     )
@@ -191,7 +102,11 @@ export default presetify({
     // Setup editorconfig
     //
     root.addChild(
-      new VFile('.editorconfig', editorconfig(), PatchStrategy.persist)
+      new VFile(
+        '.editorconfig',
+        await readResource('.editorconfig'),
+        PatchStrategy.persist
+      )
     )
 
     //
