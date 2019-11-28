@@ -18,7 +18,7 @@ export async function addTypescript(root: VDir, npm: VPackageJson) {
     new VConfigFile(
       'tsconfig.json',
       VConfigType.json,
-      await readResource('tsconfig.json'),
+      JSON.parse(await readResource('tsconfig.json')),
       { strategy: PatchStrategy.persist }
     )
   )
