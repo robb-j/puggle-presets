@@ -162,7 +162,7 @@ export default presetify({
       postversion: 'git push --follow-tags',
       'cli:dev': 'node -r dotenv/config -r ts-node/register src/cli.ts',
       'cli:prod': 'node dist/cli.js',
-      start: 'npm run cli:prod'
+      start: 'npm run cli:prod -s server'
     })
 
     root.addChild(
