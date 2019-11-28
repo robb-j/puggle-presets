@@ -5,7 +5,7 @@ export async function addPrettier(
   npm: VPackageJson,
   extensions: string
 ) {
-  const matcher = `*.${extensions}`
+  const matcher = `*.{${extensions}}`
 
   await npm.addLatestDevDependencies({
     prettier: '^1.x',
