@@ -157,9 +157,6 @@ export default presetify({
       supertest: '^4.0.2'
     })
 
-    npm.addPatch('main', PatchStrategy.placeholder, 'dist/index.js')
-    npm.addPatch('types', PatchStrategy.placeholder, 'dist/index.d.js')
-
     npm.addPatch('scripts', PatchStrategy.placeholder, {
       preversion: 'npm run test -s && npm run build',
       postversion: 'git push --follow-tags',
