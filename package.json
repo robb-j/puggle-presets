@@ -1,6 +1,7 @@
 {
   "name": "@robb_j/puggle-presets",
   "description": "A repo of puggle presets",
+  "version": "0.2.0",
   "repository": "robb-j/puggle-presets",
   "author": "Rob Anderson (https://r0b.io)",
   "license": "MIT",
@@ -20,21 +21,19 @@
   "devDependencies": {
     "@types/node": "^12.7.4",
     "@types/prompts": "^2.0.5",
-    "husky": "^3.0.5",
     "jest": "^24.9.0",
     "lint-staged": "^9.2.5",
     "prettier": "^1.19.1",
     "ts-jest": "^24.0.2",
-    "typescript": "^3.8.3"
+    "typescript": "^3.8.3",
+    "yorkie": "^2.0.0"
   },
   "prettier": {
     "semi": false,
     "singleQuote": true
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+  "gitHooks": {
+    "pre-commit": "lint-staged"
   },
   "lint-staged": {
     "*.{js,ts,tsx,json,css,md}": [
@@ -49,6 +48,5 @@
       "/node_modules/",
       "/dist/"
     ]
-  },
-  "version": "0.2.0"
+  }
 }
