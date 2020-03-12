@@ -13,6 +13,7 @@ import {
 import { addPrettier } from './utils/prettier'
 import { addJest } from './utils/jest'
 import { readResource } from './utils/vfile'
+import { addCommitOps } from './utils/commits-ops'
 
 const indexJs = (name: string) => trimInlineTemplate`
   //
@@ -65,7 +66,7 @@ export default presetify({
 
   plugins: [npmPlugin],
 
-  async apply(root, { targetName }) {
+  async apply(root, { targetName, askQuestions }) {
     let npm = VPackageJson.getOrFail(root)
 
     //
@@ -101,6 +102,20 @@ export default presetify({
     // Setup prettier
     //
     await addPrettier(root, npm, 'js,json,css,md')
+
+    //
+    // Ask whether to use commit-ops
+    //
+    const commitOps = await askQuestions('commit-ops', [
+      {
+        type: 'confirm',
+        name: 'enabled',
+        message: 'Use commit-ops (standard-version and commitlint)',
+        initial: false
+      }
+    ])
+
+    if (commitOps.enabled) addCommitOps(root, npm)
 
     //
     // Setup docker
