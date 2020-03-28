@@ -8,7 +8,7 @@ import {
   VIgnoreFile,
   VConfigFile,
   VConfigType,
-  presetify
+  presetify,
 } from 'puggle'
 import { addPrettier } from './utils/prettier'
 import { addJest } from './utils/jest'
@@ -51,13 +51,13 @@ const eslintConf = {
   root: true,
   parserOptions: {
     sourceType: 'module',
-    ecmaVersion: 2018
+    ecmaVersion: 2018,
   },
   env: {
     node: true,
-    jest: true
+    jest: true,
   },
-  extends: ['standard', 'prettier', 'prettier/standard']
+  extends: ['standard', 'prettier', 'prettier/standard'],
 }
 
 export default presetify({
@@ -84,17 +84,17 @@ export default presetify({
       'eslint-plugin-import': '^2.x',
       'eslint-plugin-node': '^10.x',
       'eslint-plugin-promise': '^4.x',
-      'eslint-plugin-standard': '^4.x'
+      'eslint-plugin-standard': '^4.x',
     })
 
     npm.addPatch('scripts', PatchStrategy.placeholder, {
-      lint: 'eslint src'
+      lint: 'eslint src',
     })
 
     root.addChild(
       new VConfigFile('.eslintrc.yml', VConfigType.yaml, eslintConf, {
         comment: 'Configuration for eslint ~ https://eslint.org/',
-        strategy: PatchStrategy.persist
+        strategy: PatchStrategy.persist,
       })
     )
 
@@ -111,8 +111,8 @@ export default presetify({
         type: 'confirm',
         name: 'enabled',
         message: 'Use commit-ops (standard-version and commitlint)',
-        initial: false
-      }
+        initial: false,
+      },
     ])
 
     if (commitOps.enabled) addCommitOps(root, npm)
@@ -161,17 +161,17 @@ export default presetify({
     // Setup template
     //
     await npm.addLatestDependencies({
-      dotenv: '^8.x'
+      dotenv: '^8.x',
     })
 
     await npm.addLatestDevDependencies({
-      nodemon: '^1.x'
+      nodemon: '^1.x',
     })
 
     npm.addPatch('scripts', PatchStrategy.placeholder, {
       preversion: 'npm run test -s',
       start: 'node -r dotenv/config src/index.js',
-      dev: "nodemon -x 'npm start' --watch src src/index.js"
+      dev: "nodemon -x 'npm start' --watch src src/index.js",
     })
 
     npm.addPatch('main', PatchStrategy.placeholder, 'src/index.js')
@@ -184,8 +184,8 @@ export default presetify({
       new VFile('.env', 'NODE_ENV=development'),
       new VDir('src', [
         new VDir('__tests__', [new VFile('index.spec.js', indexSpecJs())]),
-        new VFile('index.js', indexJs(targetName))
+        new VFile('index.js', indexJs(targetName)),
       ])
     )
-  }
+  },
 })

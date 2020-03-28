@@ -6,7 +6,7 @@ import {
   VIgnoreFile,
   VFile,
   trimInlineTemplate,
-  VDir
+  VDir,
 } from 'puggle'
 import { addJestWithTypescript } from './utils/jest'
 import { addTypescript } from './utils/typescript'
@@ -135,7 +135,7 @@ export default presetify({
     const [testHarnessTs, serverTs, cliTs] = await Promise.all([
       readResource('chowchow/test-harness.ts'),
       readResource('chowchow/server.ts'),
-      readResource('chowchow/cli.ts')
+      readResource('chowchow/cli.ts'),
     ])
 
     await npm.addLatestDependencies({
@@ -145,7 +145,7 @@ export default presetify({
       cors: '^2.x',
       dotenv: '^8.x',
       'valid-env': '^1.x',
-      yargs: '^14.x'
+      yargs: '^14.x',
     })
 
     await npm.addLatestDevDependencies({
@@ -154,7 +154,7 @@ export default presetify({
       '@types/supertest': '^2.0.8',
       '@types/yargs': '^13.0.2',
       nodemon: '^1.19.2',
-      supertest: '^4.0.2'
+      supertest: '^4.0.2',
     })
 
     npm.addPatch('scripts', PatchStrategy.placeholder, {
@@ -162,7 +162,7 @@ export default presetify({
       postversion: 'git push --follow-tags',
       'cli:dev': 'node -r dotenv/config -r ts-node/register src/cli.ts',
       'cli:prod': 'node dist/cli.js',
-      start: 'npm run cli:prod -s server'
+      start: 'npm run cli:prod -s server',
     })
 
     root.addChild(
@@ -178,11 +178,11 @@ export default presetify({
             new VFile('index.ts', routesIndex),
             new VFile('hello-route.ts', helloRoute),
             new VDir('__test__', [
-              new VFile('hello-route.spec.ts', helloRouteSpec)
-            ])
-          ])
-        ])
+              new VFile('hello-route.spec.ts', helloRouteSpec),
+            ]),
+          ]),
+        ]),
       ])
     )
-  }
+  },
 })

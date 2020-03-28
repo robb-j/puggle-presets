@@ -22,13 +22,13 @@ export function setupServer<T extends ChowChow<Context>>(server: T): T {
     .use(new LoggerModule({ enableAccessLogs: true }))
 
   // Apply express middleware
-  server.applyMiddleware(app => {
+  server.applyMiddleware((app) => {
     app.use(express.json())
 
     if (process.env.CORS_HOSTS) {
       const conf = {
         origin: process.env.CORS_HOSTS.split(','),
-        credentials: true
+        credentials: true,
       }
       app.use(cors(conf))
     }

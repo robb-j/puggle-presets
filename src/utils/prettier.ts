@@ -10,24 +10,24 @@ export async function addPrettier(
   await npm.addLatestDevDependencies({
     prettier: '^1.x',
     yorkie: '^2.x',
-    'lint-staged': '^9.x'
+    'lint-staged': '^9.x',
   })
 
   npm.addPatch('prettier', PatchStrategy.persist, {
     semi: false,
-    singleQuote: true
+    singleQuote: true,
   })
 
   npm.addPatch('gitHooks', PatchStrategy.persist, {
-    'pre-commit': 'lint-staged'
+    'pre-commit': 'lint-staged',
   })
 
   npm.addPatch('lint-staged', PatchStrategy.persist, {
-    [matcher]: ['prettier --write', 'git add']
+    [matcher]: ['prettier --write', 'git add'],
   })
 
   npm.addPatch('scripts', PatchStrategy.placeholder, {
-    prettier: `prettier --write '**/${matcher}'`
+    prettier: `prettier --write '**/${matcher}'`,
   })
 
   root.addChild(

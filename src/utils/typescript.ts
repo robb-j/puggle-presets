@@ -3,7 +3,7 @@ import {
   VPackageJson,
   VConfigFile,
   VConfigType,
-  PatchStrategy
+  PatchStrategy,
 } from 'puggle'
 import { readResource } from './vfile'
 
@@ -11,7 +11,7 @@ export async function addTypescript(root: VDir, npm: VPackageJson) {
   await npm.addLatestDevDependencies({
     typescript: '^3.x',
     'ts-node': '^8.x',
-    '@types/node': '^11.x'
+    '@types/node': '^11.x',
   })
 
   root.addChild(
@@ -25,6 +25,6 @@ export async function addTypescript(root: VDir, npm: VPackageJson) {
 
   npm.addPatch('scripts', PatchStrategy.placeholder, {
     build: 'tsc',
-    lint: 'tsc --noEmit'
+    lint: 'tsc --noEmit',
   })
 }

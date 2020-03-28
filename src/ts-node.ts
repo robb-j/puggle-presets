@@ -7,7 +7,7 @@ import {
   trimInlineTemplate,
   npmPlugin,
   PatchStrategy,
-  presetify
+  presetify,
 } from 'puggle'
 
 import { addPrettier } from './utils/prettier'
@@ -113,11 +113,11 @@ export default presetify({
     // Setup template
     //
     await npm.addLatestDependencies({
-      dotenv: '^8.0.0'
+      dotenv: '^8.0.0',
     })
 
     await npm.addLatestDevDependencies({
-      nodemon: '^1.x'
+      nodemon: '^1.x',
     })
 
     npm.addPatch('main', PatchStrategy.placeholder, 'dist/index.js')
@@ -126,7 +126,8 @@ export default presetify({
     npm.addPatch('scripts', PatchStrategy.placeholder, {
       preversion: 'npm run test -s && npm run build',
       start: 'node -r dotenv/config dist/index.js',
-      dev: "nodemon -w src -e ts -x 'npx ts-node -r dotenv/config' src/index.ts"
+      dev:
+        "nodemon -w src -e ts -x 'npx ts-node -r dotenv/config' src/index.ts",
     })
 
     root.addChild(
@@ -134,8 +135,8 @@ export default presetify({
       new VFile('.env', 'NODE_ENV=development'),
       new VDir('src', [
         new VFile('index.ts', indexTs(targetName)),
-        new VDir('__test__', [new VFile('index.spec.ts', indexSpecTs())])
+        new VDir('__test__', [new VFile('index.spec.ts', indexSpecTs())]),
       ])
     )
-  }
+  },
 })
