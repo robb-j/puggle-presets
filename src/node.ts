@@ -78,11 +78,11 @@ export default presetify({
     // Setup eslint
     //
     await npm.addLatestDevDependencies({
-      eslint: '^6.x',
+      eslint: '^7.x',
       'eslint-config-prettier': '^6.x',
       'eslint-config-standard': '^14.x',
       'eslint-plugin-import': '^2.x',
-      'eslint-plugin-node': '^10.x',
+      'eslint-plugin-node': '^11.x',
       'eslint-plugin-promise': '^4.x',
       'eslint-plugin-standard': '^4.x',
     })

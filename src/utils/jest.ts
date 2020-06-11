@@ -2,7 +2,7 @@ import { VDir, VPackageJson, PatchStrategy } from 'puggle'
 
 export async function addJest(root: VDir, npm: VPackageJson) {
   await npm.addLatestDevDependencies({
-    jest: '^24.x',
+    jest: '^26.x',
   })
 
   npm.addPatch('scripts', PatchStrategy.placeholder, {
@@ -13,9 +13,9 @@ export async function addJest(root: VDir, npm: VPackageJson) {
 
 export async function addJestWithTypescript(root: VDir, npm: VPackageJson) {
   await npm.addLatestDevDependencies({
-    jest: '^24.x',
-    'ts-jest': '^24.x',
-    '@types/jest': '^24.x',
+    jest: '^26.x',
+    'ts-jest': '^26.x',
+    '@types/jest': '^26.x',
   })
 
   npm.addPatch('jest', PatchStrategy.persist, {

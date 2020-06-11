@@ -8,9 +8,9 @@ export async function addPrettier(
   const matcher = `*.{${extensions}}`
 
   await npm.addLatestDevDependencies({
-    prettier: '^1.x',
+    prettier: '^2.x',
     yorkie: '^2.x',
-    'lint-staged': '^9.x',
+    'lint-staged': '^10.x',
   })
 
   npm.addPatch('prettier', PatchStrategy.persist, {

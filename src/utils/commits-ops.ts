@@ -8,7 +8,7 @@ function hasDevDependency(npm: VPackageJson, name: string) {
 
 export async function addCommitOps(root: VDir, npm: VPackageJson) {
   await npm.addLatestDevDependencies({
-    'standard-version': '7.x',
+    'standard-version': '8.x',
     '@commitlint/cli': '8.x',
     '@commitlint/config-conventional': '8.x',
   })
@@ -24,8 +24,4 @@ export async function addCommitOps(root: VDir, npm: VPackageJson) {
       'commitlint -e $HUSKY_GIT_PARAMS'
     )
   }
-
-  // if (npm.values.devDependencies.husky) {
-  //   // Add config if using husky?
-  // }
 }

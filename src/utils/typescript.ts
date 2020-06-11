@@ -11,7 +11,7 @@ export async function addTypescript(root: VDir, npm: VPackageJson) {
   await npm.addLatestDevDependencies({
     typescript: '^3.x',
     'ts-node': '^8.x',
-    '@types/node': '^11.x',
+    '@types/node': '^14.x',
   })
 
   root.addChild(

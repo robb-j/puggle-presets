@@ -113,11 +113,11 @@ export default presetify({
     // Setup template
     //
     await npm.addLatestDependencies({
-      dotenv: '^8.0.0',
+      dotenv: '8.x',
     })
 
     await npm.addLatestDevDependencies({
-      nodemon: '^1.x',
+      nodemon: '2.x',
     })
 
     npm.addPatch('main', PatchStrategy.placeholder, 'dist/index.js')
