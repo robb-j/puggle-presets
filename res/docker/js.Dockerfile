@@ -4,6 +4,6 @@ WORKDIR /app
 EXPOSE 3000
 ENV NODE_ENV production
 COPY ["package*.json", "/app/"]
-RUN npm ci &> /dev/null
+RUN npm ci
 COPY ["src", "/app/src"]
-CMD [ "npm", "start", "-s" ]
+ENTRYPOINT ["node", "dist/index.js"]
