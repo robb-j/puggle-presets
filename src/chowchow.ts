@@ -5,15 +5,16 @@ import {
   PatchStrategy,
   VIgnoreFile,
   VFile,
-  trimInlineTemplate,
   VDir,
 } from 'puggle'
+import dedent = require('dedent')
+
 import { addJestWithTypescript } from './utils/jest'
 import { addTypescript } from './utils/typescript'
 import { addPrettier } from './utils/prettier'
 import { readVFile, readResource } from './utils/vfile'
 
-const readme = (name: string) => trimInlineTemplate`
+const readme = (name: string) => dedent`
   # ${name}
   
   Coming soon...
@@ -23,7 +24,7 @@ const readme = (name: string) => trimInlineTemplate`
   > This project was set up by [puggle](https://npm.im/puggle)
 `
 
-const typesTs = trimInlineTemplate`
+const typesTs = dedent`
   import { BaseContext } from '@robb_j/chowchow'
   import { LoggerContext } from '@robb_j/chowchow-logger'
   import { JsonEnvelopeContext } from '@robb_j/chowchow-json-envelope'
@@ -33,11 +34,11 @@ const typesTs = trimInlineTemplate`
     JsonEnvelopeContext
 `
 
-const routesIndex = trimInlineTemplate`
+const routesIndex = dedent`
   export { default as hello } from './hello-route'
 `
 
-const helloRoute = trimInlineTemplate`
+const helloRoute = dedent`
   import { Context } from '../../types'
 
   export default async ({ sendData }: Context) => {
@@ -45,7 +46,7 @@ const helloRoute = trimInlineTemplate`
   }
 `
 
-const helloRouteSpec = trimInlineTemplate`
+const helloRouteSpec = dedent`
   import { MockChowChow, setupServer } from '../../../utils/test-harness'
 
   describe('GET: /', () => {

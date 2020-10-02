@@ -2,20 +2,20 @@ import {
   VDir,
   VFile,
   VPackageJson,
-  trimInlineTemplate,
   npmPlugin,
   PatchStrategy,
   VIgnoreFile,
-  VConfigFile,
-  VConfigType,
   presetify,
 } from 'puggle'
+import dedent = require('dedent')
+
 import { addPrettier } from './utils/prettier'
 import { addJest } from './utils/jest'
 import { readResource } from './utils/vfile'
 import { addCommitOps } from './utils/commits-ops'
+import { addEslint } from './utils/eslint'
 
-const indexJs = (name: string) => trimInlineTemplate`
+const indexJs = (name: string) => dedent`
   //
   // The app entrypoint
   //
@@ -25,7 +25,7 @@ const indexJs = (name: string) => trimInlineTemplate`
   })()
 `
 
-const indexSpecJs = () => trimInlineTemplate`
+const indexSpecJs = () => dedent`
   //
   // An example unit test
   //
@@ -37,7 +37,7 @@ const indexSpecJs = () => trimInlineTemplate`
   })
 `
 
-const readme = (name: string) => trimInlineTemplate`
+const readme = (name: string) => dedent`
   # ${name}
 
   Coming soon...
@@ -46,19 +46,6 @@ const readme = (name: string) => trimInlineTemplate`
 
   > This project was set up by [puggle](https://npm.im/puggle)
 `
-
-const eslintConf = {
-  root: true,
-  parserOptions: {
-    sourceType: 'module',
-    ecmaVersion: 2018,
-  },
-  env: {
-    node: true,
-    jest: true,
-  },
-  extends: ['standard', 'prettier', 'prettier/standard'],
-}
 
 export default presetify({
   name: 'robb-j:node',
@@ -77,26 +64,7 @@ export default presetify({
     //
     // Setup eslint
     //
-    await npm.addLatestDevDependencies({
-      eslint: '^7.x',
-      'eslint-config-prettier': '^6.x',
-      'eslint-config-standard': '^14.x',
-      'eslint-plugin-import': '^2.x',
-      'eslint-plugin-node': '^11.x',
-      'eslint-plugin-promise': '^4.x',
-      'eslint-plugin-standard': '^4.x',
-    })
-
-    npm.addPatch('scripts', PatchStrategy.placeholder, {
-      lint: 'eslint src',
-    })
-
-    root.addChild(
-      new VConfigFile('.eslintrc.yml', VConfigType.yaml, eslintConf, {
-        comment: 'Configuration for eslint ~ https://eslint.org/',
-        strategy: PatchStrategy.persist,
-      })
-    )
+    await addEslint(root, npm)
 
     //
     // Setup prettier

@@ -23,7 +23,7 @@ export async function addPrettier(
   })
 
   npm.addPatch('lint-staged', PatchStrategy.persist, {
-    [matcher]: ['prettier --write', 'git add'],
+    [matcher]: ['prettier --write'],
   })
 
   npm.addPatch('scripts', PatchStrategy.placeholder, {

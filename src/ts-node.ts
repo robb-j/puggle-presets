@@ -1,21 +1,20 @@
 import {
-  Preset,
   VDir,
   VFile,
   VIgnoreFile,
   VPackageJson,
-  trimInlineTemplate,
   npmPlugin,
   PatchStrategy,
   presetify,
 } from 'puggle'
+import dedent = require('dedent')
 
 import { addPrettier } from './utils/prettier'
 import { addTypescript } from './utils/typescript'
 import { readVFile, readResource } from './utils/vfile'
 import { addJestWithTypescript } from './utils/jest'
 
-const indexTs = (name: string) => trimInlineTemplate`
+const indexTs = (name: string) => dedent`
   // 
   // The app entrypoint
   // 
@@ -25,7 +24,7 @@ const indexTs = (name: string) => trimInlineTemplate`
   })()
 `
 
-const indexSpecTs = () => trimInlineTemplate`
+const indexSpecTs = () => dedent`
   //
   // An example unit test
   //
@@ -37,7 +36,7 @@ const indexSpecTs = () => trimInlineTemplate`
   })
 `
 
-const readme = (name: string) => trimInlineTemplate`
+const readme = (name: string) => dedent`
   # ${name}
   
   Coming soon...

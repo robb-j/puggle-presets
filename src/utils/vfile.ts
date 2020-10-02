@@ -1,4 +1,4 @@
-import { trimInlineTemplate, VFile, PatchStrategy } from 'puggle'
+import { VFile, PatchStrategy } from 'puggle'
 
 import fs = require('fs')
 import { join } from 'path'
