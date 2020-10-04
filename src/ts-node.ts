@@ -24,6 +24,39 @@ const indexTs = (name: string) => dedent`
   })()
 `
 
+const cliTs = (name: string) => dedent`
+  #!/usr/bin/env node
+
+  //
+  // The cli entrypoint
+  //
+
+  import yargs = require('yargs')
+  
+  yargs.help().alias('h', 'help').demandCommand().recommendCommands()
+
+  yargs.command(
+    'example',
+    'A placeholder command',
+    (yargs) => yargs,
+    async (args) => {
+      console.log(args)
+    }
+  )
+
+  yargs.command(
+    '*',
+    false,
+    (yargs) => yargs,
+    () => {
+      console.error('Unknown command entered, try --help')
+      process.exit(1)
+    }
+  )
+
+  yargs.parse()
+`
+
 const indexSpecTs = () => dedent`
   //
   // An example unit test
@@ -54,7 +87,7 @@ export default presetify({
 
   plugins: [npmPlugin],
 
-  async apply(root, { targetName }) {
+  async apply(root, { targetName, askQuestions }) {
     let npm = VPackageJson.getOrFail(root)
 
     //
@@ -109,6 +142,18 @@ export default presetify({
     )
 
     //
+    // Ask whether to add a cli
+    //
+    const cli = await askQuestions('cli', [
+      {
+        type: 'confirm',
+        name: 'enabled',
+        message: 'Create a CLI app?',
+        initial: false,
+      },
+    ])
+
+    //
     // Setup template
     //
     await npm.addLatestDependencies({
@@ -124,9 +169,7 @@ export default presetify({
 
     npm.addPatch('scripts', PatchStrategy.placeholder, {
       preversion: 'npm run test -s && npm run build',
-      start: 'node -r dotenv/config dist/index.js',
-      dev:
-        "nodemon -w src -e ts -x 'npx ts-node -r dotenv/config' src/index.ts",
+      start: 'node -r ts-node/register -r dotenv/config src/index.js',
     })
 
     root.addChild(
@@ -137,5 +180,28 @@ export default presetify({
         new VDir('__test__', [new VFile('index.spec.ts', indexSpecTs())]),
       ])
     )
+
+    if (cli.enabled) {
+      await npm.addLatestDependencies({
+        yargs: '16.x',
+      })
+
+      await npm.addLatestDevDependencies({
+        '@types/yargs': '15.x',
+      })
+
+      npm.addPatch('scripts', PatchStrategy.placeholder, {
+        start: 'node -r ts-node/register -r dotenv/config src/cli.ts',
+      })
+
+      const src = root.find('src') as VDir
+      src.addChild(new VFile('cli.ts', cliTs(targetName)))
+
+      const dockerfile = root.find('Dockerfile') as VFile
+      dockerfile.contents = dockerfile.contents.replace(
+        'dist/index.js',
+        'dist/cli.js'
+      )
+    }
   },
 })
