@@ -9,10 +9,15 @@ import {
 } from 'puggle'
 import dedent = require('dedent')
 
-import { addPrettier } from './utils/prettier'
-import { addTypescript } from './utils/typescript'
-import { readVFile, readResource } from './utils/vfile'
-import { addJestWithTypescript } from './utils/jest'
+import {
+  addDocker,
+  addJestWithTypescript,
+  addPrettier,
+  addTypescript,
+  readResource,
+  readVFile,
+  useCli,
+} from './utils/'
 
 const indexTs = (name: string) => dedent`
   // 
@@ -22,39 +27,6 @@ const indexTs = (name: string) => dedent`
   ;(async () => {
     console.log('Hello, ${name}!')
   })()
-`
-
-const cliTs = (name: string) => dedent`
-  #!/usr/bin/env node
-
-  //
-  // The cli entrypoint
-  //
-
-  import yargs = require('yargs')
-  
-  yargs.help().alias('h', 'help').demandCommand().recommendCommands()
-
-  yargs.command(
-    'example',
-    'A placeholder command',
-    (yargs) => yargs,
-    async (args) => {
-      console.log(args)
-    }
-  )
-
-  yargs.command(
-    '*',
-    false,
-    (yargs) => yargs,
-    () => {
-      console.error('Unknown command entered, try --help')
-      process.exit(1)
-    }
-  )
-
-  yargs.parse()
 `
 
 const indexSpecTs = () => dedent`
@@ -69,17 +41,34 @@ const indexSpecTs = () => dedent`
   })
 `
 
-const readme = (name: string) => dedent`
-  # ${name}
-  
-  Coming soon...
-  
-  ---
-  
-  > This project was set up by [puggle](https://npm.im/puggle)
-`
-
 const toIgnore = ['*.env', '.DS_Store', 'node_modules', 'coverage', 'dist']
+
+async function generateReadme(projectName: string) {
+  const dev = await Promise.all([
+    readResource('docs/setup.md'),
+    readResource('docs/regular-use.md'),
+    readResource('docs/testing.md'),
+    readResource('docs/irregular-use.md'),
+    readResource('docs/prettier.md'),
+    readResource('docs/release.md'),
+  ])
+
+  return dedent`
+    # ${projectName}
+
+    ## Usage
+
+    > Work in progress
+
+    ## Development
+
+    ${dev.join('\n')}
+
+    ---
+  
+    > This project was set up by [puggle](https://npm.im/puggle)
+  `
+}
 
 export default presetify({
   name: 'robb-j:ts-node',
@@ -101,22 +90,9 @@ export default presetify({
     await addTypescript(root, npm)
 
     //
-    //  Setup prettier
+    // Setup prettier
     //
     await addPrettier(root, npm, 'js,json,css,md,ts,tsx')
-
-    //
-    // Setup docker
-    //
-    root.addChild(
-      await readVFile('Dockerfile', 'docker/ts.Dockerfile'),
-      new VIgnoreFile(
-        '.dockerignore',
-        'Files to ignore from the docker daemon',
-        toIgnore,
-        PatchStrategy.persist
-      )
-    )
 
     //
     // Setup git
@@ -134,15 +110,56 @@ export default presetify({
     // Setup editorconfig
     //
     root.addChild(
-      new VFile(
-        '.editorconfig',
-        await readResource('.editorconfig'),
-        PatchStrategy.persist
-      )
+      await readVFile('.editorconfig', '.editorconfig', PatchStrategy.persist)
     )
 
     //
-    // Ask whether to add a cli
+    // Setup template
+    //
+    await npm.addLatestDependencies({
+      dotenv: '8.x',
+      debug: '4.x',
+    })
+
+    await npm.addLatestDevDependencies({
+      '@types/debug': '4.x',
+    })
+
+    npm.addPatch('main', PatchStrategy.placeholder, 'dist/index.js')
+    npm.addPatch('types', PatchStrategy.placeholder, 'dist/index.d.js')
+
+    npm.addPatch('scripts', PatchStrategy.placeholder, {
+      preversion: 'npm run test && npm run build',
+      postversion: 'git push --follow-tags',
+    })
+
+    root.addChild(
+      new VFile('README.md', await generateReadme(targetName)),
+      new VFile('.env', 'NODE_ENV=development'),
+      new VDir('src', [
+        new VFile('index.ts', indexTs(targetName)),
+        new VDir('__test__', [new VFile('index.spec.ts', indexSpecTs())]),
+      ])
+    )
+
+    //
+    // Setup docker
+    //
+    const docker = await askQuestions('docker', [
+      {
+        type: 'confirm',
+        name: 'enabled',
+        message: 'Use Docker?',
+        initial: false,
+      },
+    ])
+
+    if (docker.enabled) {
+      await addDocker(root, docker, toIgnore)
+    }
+
+    //
+    // Setup CLI
     //
     const cli = await askQuestions('cli', [
       {
@@ -153,55 +170,8 @@ export default presetify({
       },
     ])
 
-    //
-    // Setup template
-    //
-    await npm.addLatestDependencies({
-      dotenv: '8.x',
-    })
-
-    await npm.addLatestDevDependencies({
-      nodemon: '2.x',
-    })
-
-    npm.addPatch('main', PatchStrategy.placeholder, 'dist/index.js')
-    npm.addPatch('types', PatchStrategy.placeholder, 'dist/index.d.js')
-
-    npm.addPatch('scripts', PatchStrategy.placeholder, {
-      preversion: 'npm run test -s && npm run build',
-      start: 'node -r ts-node/register -r dotenv/config src/index.js',
-    })
-
-    root.addChild(
-      new VFile('README.md', readme(targetName)),
-      new VFile('.env', 'NODE_ENV=development'),
-      new VDir('src', [
-        new VFile('index.ts', indexTs(targetName)),
-        new VDir('__test__', [new VFile('index.spec.ts', indexSpecTs())]),
-      ])
-    )
-
     if (cli.enabled) {
-      await npm.addLatestDependencies({
-        yargs: '16.x',
-      })
-
-      await npm.addLatestDevDependencies({
-        '@types/yargs': '15.x',
-      })
-
-      npm.addPatch('scripts', PatchStrategy.placeholder, {
-        start: 'node -r ts-node/register -r dotenv/config src/cli.ts',
-      })
-
-      const src = root.find('src') as VDir
-      src.addChild(new VFile('cli.ts', cliTs(targetName)))
-
-      const dockerfile = root.find('Dockerfile') as VFile
-      dockerfile.contents = dockerfile.contents.replace(
-        'dist/index.js',
-        'dist/cli.js'
-      )
+      await useCli(root, npm, targetName, docker.enabled, true)
     }
   },
 })

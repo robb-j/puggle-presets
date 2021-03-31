@@ -1,9 +1,14 @@
 # Use a node alpine image install packages and run the start script
-FROM node:12-alpine
-WORKDIR /app
+# Runs as "node" user so any upload folders will need to be chown-ed
+FROM node:14-alpine
 EXPOSE 3000
 ENV NODE_ENV production
-COPY ["package*.json", "/app/"]
+
+RUN mkdir /app && chown -R node:node /app
+COPY --chown=node ["package*.json", "/app/"]
+USER node
+WORKDIR /app
+
 RUN npm ci
-COPY ["src", "/app/src"]
-ENTRYPOINT ["node", "dist/index.js"]
+COPY --chown=node ["src", "/app/src"]
+ENTRYPOINT ["node", "src/index.js"]

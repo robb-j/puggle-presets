@@ -1,3 +1,7 @@
+//
+// @deprecated - Use TypeScript
+//
+
 import {
   VDir,
   VFile,
