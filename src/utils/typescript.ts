@@ -10,7 +10,7 @@ import { readResource } from './vfile'
 export async function addTypescript(root: VDir, npm: VPackageJson) {
   await npm.addLatestDevDependencies({
     typescript: '^4.x',
-    'ts-node': '^9.x',
+    'ts-node': '^10.x',
     '@types/node': '^14.x',
   })
 

@@ -1,15 +1,11 @@
 # Puggle presets
 
-A [monorepo](https://danluu.com/monorepo/)
-of [puggle](https://www.npmjs.com/package/puggle) presets
+My personal presets for
+[puggle](https://www.npmjs.com/package/puggle).
 
-> A work in progress
+## Presets
 
-## Contents
-
-- [robb-j:node](/preset/node)
-- [robb-j:ts-node](/preset/ts-node)
-- [robb-j:chowchow](/preset/chowchow)
+- [robb-j:ts-node](/src/ts-node.ts)
 
 ## Future explorations
 

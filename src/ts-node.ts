@@ -72,7 +72,7 @@ async function generateReadme(projectName: string) {
 
 export default presetify({
   name: 'robb-j:ts-node',
-  version: '0.2.2',
+  version: '0.3.0',
 
   plugins: [npmPlugin],
 
@@ -117,12 +117,12 @@ export default presetify({
     // Setup template
     //
     await npm.addLatestDependencies({
-      dotenv: '8.x',
       debug: '4.x',
     })
 
     await npm.addLatestDevDependencies({
       '@types/debug': '4.x',
+      dotenv: '10.x',
     })
 
     npm.addPatch('main', PatchStrategy.placeholder, 'dist/index.js')

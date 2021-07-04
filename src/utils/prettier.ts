@@ -10,7 +10,7 @@ export async function addPrettier(
   await npm.addLatestDevDependencies({
     prettier: '^2.x',
     yorkie: '^2.x',
-    'lint-staged': '^10.x',
+    'lint-staged': '^11.x',
   })
 
   npm.addPatch('prettier', PatchStrategy.persist, {

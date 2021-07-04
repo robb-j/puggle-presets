@@ -32,11 +32,11 @@ export async function useCli(
   usingTypescript: boolean
 ) {
   await npm.addLatestDependencies({
-    yargs: '16.x',
+    yargs: '17.x',
   })
 
   await npm.addLatestDevDependencies({
-    '@types/yargs': '16.x',
+    '@types/yargs': '17.x',
   })
 
   const extension = usingTypescript ? 'ts' : 'js'

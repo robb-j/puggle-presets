@@ -9,6 +9,6 @@ COPY --chown=node ["package*.json", "/app/"]
 USER node
 WORKDIR /app
 
-RUN npm ci
+RUN npm ci && npm cache clean --force
 COPY --chown=node ["src", "/app/src"]
 ENTRYPOINT ["node", "src/index.js"]

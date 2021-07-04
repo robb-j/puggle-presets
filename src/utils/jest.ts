@@ -13,9 +13,9 @@ export async function addJest(root: VDir, npm: VPackageJson) {
 
 export async function addJestWithTypescript(root: VDir, npm: VPackageJson) {
   await npm.addLatestDevDependencies({
-    jest: '^26.x',
-    'ts-jest': '^26.x',
-    '@types/jest': '^26.x',
+    jest: '^27.x',
+    'ts-jest': '^27.x',
+    '@types/jest': '^27.x',
   })
 
   npm.addPatch('jest', PatchStrategy.persist, {
