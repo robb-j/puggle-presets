@@ -72,7 +72,7 @@ async function generateReadme(projectName: string) {
 
 export default presetify({
   name: 'robb-j:ts-node',
-  version: '0.3.0',
+  version: '0.3.1',
 
   plugins: [npmPlugin],
 
